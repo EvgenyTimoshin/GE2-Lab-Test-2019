@@ -98,6 +98,7 @@ public class FighterScript : MonoBehaviour {
         while (true) {
             if (_parentBase._tiberium >= 7) {
                 _tiribium = 7;
+                _parentBase._tiberium -= 7;
                 StopRefueling();
             }
                

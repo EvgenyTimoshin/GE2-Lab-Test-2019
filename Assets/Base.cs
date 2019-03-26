@@ -49,6 +49,7 @@ public class Base : MonoBehaviour
         //tateMachine stateMachine = newFighter.AddComponent<StateMachine>();
         Boid boid = newFighter.AddComponent<Boid>();
         Arrive arrive = newFighter.AddComponent<Arrive>();
+        //ObstacleAvoidance ob = newFighter.AddComponent<ObstacleAvoidance>();
         arrive.enabled = false;
 
     }
