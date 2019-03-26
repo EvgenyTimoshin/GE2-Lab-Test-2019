@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class BaseSingleton : MonoBehaviour {
 
-    public List<Base> _allBases = new List<Transform>();
+    public List<Base> _allBases = new List<Base>();
     public static BaseSingleton Instance;
 	// Use this for initialization
 	void Start () {
@@ -20,7 +20,7 @@ public class BaseSingleton : MonoBehaviour {
 		
 	}
 
-    public void GetRandom(Base notSelf) {
+    public Transform GetRandomTarget(Base notSelf) {
         List<Base> possibles = new List<Base>();
 
         foreach (Base b in _allBases) {
@@ -31,6 +31,8 @@ public class BaseSingleton : MonoBehaviour {
                 possibles.Add(b);
             }
         }
+
+        return possibles[(int)Random.Range(0, possibles.Count)].transform;
     }
 
 

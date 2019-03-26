@@ -5,27 +5,31 @@ using UnityEngine;
 public class Travelling : State {
     //public StateMachine owner;
     public void Enter() {
-       
-        //Turn on seek behaviour
+        owner.GetComponent<FighterScript>().PickTargetBase();
+        owner.GetComponent<Arrive>().enabled = true;
     }
     public void Exit() {
-        
-        
+
+        owner.GetComponent<Arrive>().enabled = false;
         //Turn off seek behaviour
     }
     public void Think() {
         //If target is < 20 away from base transition to attacking state
+        Vector3 target = owner.GetComponent<FighterScript>().target.position;
+        if (Vector3.Distance(owner.transform.position, target) < 20) {
+            owner.GetComponent<StateMachine>().ChangeState(new Attacking());
+        }
     }
 }
 
 public class Refueling : State {
     public void Enter()
     {
-        //Turn on refueling behaviour
+        owner.GetComponent<FighterScript>().AttemptRefuel();
     }
     public void Exit()
     {
-        //stop refuleing
+        owner.GetComponent<FighterScript>().StopRefueling();
     }
     public void Think()
     {
@@ -36,25 +40,34 @@ public class Refueling : State {
 public class Attacking : State {
     //public StateMachine owner;
     public void Enter() {
-        //Turn on shooting behaviour
+        owner.GetComponent<FighterScript>().StartShootingBase();
     }
     public void Exit() {
-        //stop shooting
+        owner.GetComponent<FighterScript>().StopShootingBase();
     }
     public void Think() {
-        //Shoot while there is enough tiribium in the base to shoot
+        if (owner.GetComponent<FighterScript>().GetTiribium() <= 0) {
+            owner.GetComponent<StateMachine>().ChangeState(new Retrieving());
+        }
     }
 }
 
 public class Retrieving : State {
     //public StateMachine owner;
     public void Enter() {
-        // Seek to parent turned on
+        owner.GetComponent<FighterScript>().SetParentTarget();
+        owner.GetComponent<Arrive>().enabled = true;
     }
     public void Exit() {
+        owner.GetComponent<Arrive>().enabled = false;
         // finish seek
     }
     public void Think() {
         //keep checking if at the base or not, if hit the base despawn
+        Vector3 target = owner.GetComponent<FighterScript>().target.position;
+        if (Vector3.Distance(owner.transform.position, target) < 20)
+        {
+            owner.GetComponent<StateMachine>().ChangeState(new Refueling());
+        }
     }
 }

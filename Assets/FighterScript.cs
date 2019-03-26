@@ -11,19 +11,26 @@ public class FighterScript : MonoBehaviour {
     private Material _mat;
     public Base _parentBase;
     public StateMachine _stateMachine;
+    public Transform target;
+    IEnumerator shooting;
 	// Use this for initialization
 	void Start () {
         _tiribium = 7;
         _stateMachine = gameObject.AddComponent<StateMachine>();
-        Transform target = PickTarget();
-        _stateMachine.currentState = new Travelling();
-	}
+        //PickTargetBase();
+        GetComponent<StateMachine>().ChangeState(new Travelling());
+    }
 
-    public Transform PickTarget() {
-        Transform trans = null;
-       
+    public void PickTargetBase() {
+        target = BaseSingleton.Instance.GetRandomTarget(_parentBase);
+        Arrive arrive = GetComponent<Arrive>();
+        arrive.targetGameObject = target.gameObject;
+    }
 
-        return trans;
+    public void SetParentTarget() {
+        Arrive arrive = GetComponent<Arrive>();
+        arrive.targetGameObject = _stateMachine.gameObject;
+        target = _stateMachine.transform;
     }
 
 	// Update is called once per frame
@@ -48,12 +55,22 @@ public class FighterScript : MonoBehaviour {
         return _tiribium;
     }
 
-    IEnumerable ShootBase(GameObject target) {
+    public void StartShootingBase() {
+        shooting = ShootBase();
+        StartCoroutine(shooting);
+    }
+
+    public void StopShootingBase() {
+        StopCoroutine(shooting);
+    }
+
+    IEnumerator ShootBase() {
 
         while (true) {
             GameObject prefab = Instantiate(_bulletPrefab);
             prefab.GetComponent<Renderer>().material.color = _color;
             Bullet bullet = prefab.AddComponent<Bullet>();
+            _tiribium--;
             yield return new WaitForSeconds(1/_fireRatePerSecond);
         }
     }
