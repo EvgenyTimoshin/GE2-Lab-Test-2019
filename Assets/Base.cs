@@ -11,6 +11,8 @@ public class Base : MonoBehaviour
 
     public GameObject _fighterPrefab;
 
+    public GameObject _bulletPrefab;
+
     Coroutine _tiberiumIncrease;
 
     public int _tiberiumPerSecond;
@@ -26,6 +28,7 @@ public class Base : MonoBehaviour
         _baseMaterial = GetComponent<Renderer>().material;
 
         StartCoroutine(IncreaseTiberium(_tiberiumPerSecond));
+        gameObject.tag = "base";
     }
 
     // Update is called once per frame
@@ -41,7 +44,12 @@ public class Base : MonoBehaviour
         FighterScript fighter = newFighter.AddComponent<FighterScript>();
         fighter.SetColor(_baseMaterial);
         fighter.SetParent(this);
-        StateMachine stateMachine = newFighter.AddComponent<StateMachine>();
+        //Had to pass through here had trouble with having script on prefab for some reason
+        fighter.SetBullet(_bulletPrefab);
+        //tateMachine stateMachine = newFighter.AddComponent<StateMachine>();
+        Boid boid = newFighter.AddComponent<Boid>();
+        Arrive arrive = newFighter.AddComponent<Arrive>();
+        arrive.enabled = false;
 
     }
 
@@ -55,6 +63,12 @@ public class Base : MonoBehaviour
 
             _tiberium++;
             yield return new WaitForSeconds(1.0f/perSecond);
+        }
+    }
+
+    private void OnTriggerEnter(Collider other) {
+        if (other.tag == "bullet") {
+            _tiberium -= 0.5f;
         }
     }
 }

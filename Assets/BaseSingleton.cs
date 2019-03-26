@@ -21,16 +21,9 @@ public class BaseSingleton : MonoBehaviour {
 	}
 
     public Transform GetRandomTarget(Base notSelf) {
-        List<Base> possibles = new List<Base>();
+        List<Base> possibles = new List<Base>(_allBases);
 
-        foreach (Base b in _allBases) {
-            if (b.Equals(notSelf))
-            {
-            }
-            else {
-                possibles.Add(b);
-            }
-        }
+        possibles.Remove(notSelf);
 
         return possibles[(int)Random.Range(0, possibles.Count)].transform;
     }

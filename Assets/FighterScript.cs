@@ -13,12 +13,14 @@ public class FighterScript : MonoBehaviour {
     public StateMachine _stateMachine;
     public Transform target;
     IEnumerator shooting;
+    IEnumerator refueling;
 	// Use this for initialization
 	void Start () {
         _tiribium = 7;
         _stateMachine = gameObject.AddComponent<StateMachine>();
         //PickTargetBase();
         GetComponent<StateMachine>().ChangeState(new Travelling());
+        
     }
 
     public void PickTargetBase() {
@@ -29,8 +31,8 @@ public class FighterScript : MonoBehaviour {
 
     public void SetParentTarget() {
         Arrive arrive = GetComponent<Arrive>();
-        arrive.targetGameObject = _stateMachine.gameObject;
-        target = _stateMachine.transform;
+        arrive.targetGameObject = _parentBase.gameObject;
+        target = _parentBase.transform;
     }
 
 	// Update is called once per frame
@@ -64,14 +66,42 @@ public class FighterScript : MonoBehaviour {
         StopCoroutine(shooting);
     }
 
+    public void SetBullet(GameObject bullet) {
+        _bulletPrefab = bullet;
+    }
+
     IEnumerator ShootBase() {
 
         while (true) {
             GameObject prefab = Instantiate(_bulletPrefab);
-            prefab.GetComponent<Renderer>().material.color = _color;
+            prefab.GetComponent<Renderer>().material = _mat;
             Bullet bullet = prefab.AddComponent<Bullet>();
+            bullet.tag = "bullet";
+            bullet.transform.rotation = this.transform.rotation;
+            bullet.transform.position = this.transform.position;
             _tiribium--;
             yield return new WaitForSeconds(1/_fireRatePerSecond);
+        }
+    }
+
+    public void AttemptRefuel() {
+        refueling = Refuelling();
+        StartCoroutine(refueling);
+    }
+
+    public void StopRefueling() {
+        StopCoroutine(refueling);
+    }
+
+    IEnumerator Refuelling() {
+
+        while (true) {
+            if (_parentBase._tiberium >= 7) {
+                _tiribium = 7;
+                StopRefueling();
+            }
+               
+            yield return new WaitForSeconds(1 / _fireRatePerSecond);
         }
     }
     
